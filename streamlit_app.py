@@ -714,6 +714,8 @@ def main() -> None:
                     "🚀 Count Tokens", use_container_width=True, type="primary")
 
     with results_col:
+        # Results section - display when button is clicked
+        if count_button:
 
     with results_col:
         # Results section - display when button is clicked
