@@ -115,7 +115,8 @@ def get_context7_docs(library_name: str) -> Optional[str]:
         with requests.post(
             mcp_url,
             json=resolve_payload,
-            headers={"Content-Type": "application/json", "Accept": "text/event-stream"},
+            headers={"Content-Type": "application/json",
+                     "Accept": "text/event-stream"},
             stream=True,
             timeout=10,
         ) as resp:
@@ -236,7 +237,8 @@ def count_tokens_gemini_text(text: str, model: str) -> int:
     try:
         # Import inside the function to avoid import errors when the package
         # is unavailable.
-        from vertexai.preview.language_models import GenerativeModel  # type: ignore[import]
+        # type: ignore[import]
+        from vertexai.preview.language_models import GenerativeModel
 
         gm = GenerativeModel(model)
         # Compose a Gemini chat message.  A single user message can be
@@ -456,11 +458,17 @@ def process_uploaded_file(
         if "Gemini" in selected_models and gemini_model:
             counts.gemini_tokens = count_tokens_gemini_text(text, gemini_model)
         if "Anthropic" in selected_models and anthropic_model:
-            counts.anthropic_tokens = count_tokens_anthropic(text, anthropic_model, anthropic_key)
+            counts.anthropic_tokens = count_tokens_anthropic(
+                text, anthropic_model, anthropic_key)
         return counts
     # Process PDF files.
     if ext == ".pdf":
         pdf_text = extract_text_from_pdf(file)
+        # Reset file pointer so we can reuse the same object for page counting
+        try:
+            file.seek(0)
+        except Exception:
+            pass
         counts.words = count_words(pdf_text)
         counts.characters = count_characters(pdf_text)
         if "OpenAI" in selected_models and openai_model:
@@ -475,7 +483,8 @@ def process_uploaded_file(
             except Exception:
                 counts.gemini_tokens = None
         if "Anthropic" in selected_models and anthropic_model:
-            counts.anthropic_tokens = count_tokens_anthropic(pdf_text, anthropic_model, anthropic_key)
+            counts.anthropic_tokens = count_tokens_anthropic(
+                pdf_text, anthropic_model, anthropic_key)
         return counts
     # Process DOCX files.
     if ext == ".docx":
@@ -485,9 +494,11 @@ def process_uploaded_file(
         if "OpenAI" in selected_models and openai_model:
             counts.openai_tokens = count_tokens_openai(doc_text, openai_model)
         if "Gemini" in selected_models and gemini_model:
-            counts.gemini_tokens = count_tokens_gemini_text(doc_text, gemini_model)
+            counts.gemini_tokens = count_tokens_gemini_text(
+                doc_text, gemini_model)
         if "Anthropic" in selected_models and anthropic_model:
-            counts.anthropic_tokens = count_tokens_anthropic(doc_text, anthropic_model, anthropic_key)
+            counts.anthropic_tokens = count_tokens_anthropic(
+                doc_text, anthropic_model, anthropic_key)
         return counts
     # Process images.
     if ext in {".png", ".jpg", ".jpeg", ".bmp", ".gif"}:
@@ -533,7 +544,8 @@ def process_uploaded_file(
 
 def main() -> None:
     """Entry point for the Streamlit application."""
-    st.set_page_config(page_title="Token Counter", page_icon="📏", layout="wide")
+    st.set_page_config(page_title="Token Counter",
+                       page_icon="📏", layout="wide")
     st.title("Token Counter and Analyzer")
     st.markdown(
         """
@@ -595,7 +607,8 @@ def main() -> None:
     anthropic_key: Optional[str] = None
     if "OpenAI" in selected_models:
         openai_model = st.selectbox(
-            "OpenAI model", ["gpt-4o", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
+            "OpenAI model", ["gpt-4o", "gpt-4-turbo",
+                             "gpt-4", "gpt-3.5-turbo"],
             index=0,
             help="Model name passed to tiktoken for encoding."
         )
@@ -645,11 +658,14 @@ def main() -> None:
                 characters=count_characters(input_text),
             )
             if "OpenAI" in selected_models and openai_model:
-                tc.openai_tokens = count_tokens_openai(input_text, openai_model)
+                tc.openai_tokens = count_tokens_openai(
+                    input_text, openai_model)
             if "Gemini" in selected_models and gemini_model:
-                tc.gemini_tokens = count_tokens_gemini_text(input_text, gemini_model)
+                tc.gemini_tokens = count_tokens_gemini_text(
+                    input_text, gemini_model)
             if "Anthropic" in selected_models and anthropic_model:
-                tc.anthropic_tokens = count_tokens_anthropic(input_text, anthropic_model, anthropic_key)
+                tc.anthropic_tokens = count_tokens_anthropic(
+                    input_text, anthropic_model, anthropic_key)
             results.append(tc)
         # Process uploaded files
         for uf in uploaded_files or []:
@@ -681,7 +697,8 @@ def main() -> None:
             st.markdown("### Results")
             st.table(table)
         else:
-            st.warning("Please enter text or upload at least one supported file.")
+            st.warning(
+                "Please enter text or upload at least one supported file.")
 
 
 if __name__ == "__main__":
