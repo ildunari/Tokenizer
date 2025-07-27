@@ -50,11 +50,11 @@ def apply_custom_css():
     .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
-        max-width: 1400px;
+        max-width: 1600px;
     }
     
     h1 {
-        font-size: 2rem !important;
+        font-size: 2.2rem !important;
         font-weight: 700 !important;
         margin-bottom: 0.5rem !important;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -63,21 +63,28 @@ def apply_custom_css():
     }
     
     h3 {
-        font-size: 1.1rem !important;
+        font-size: 1.15rem !important;
         font-weight: 600 !important;
         color: #374151 !important;
+        margin-top: 1.2rem !important;
+        margin-bottom: 0.7rem !important;
+    }
+    
+    h4 {
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+        color: #4b5563 !important;
         margin-top: 1rem !important;
         margin-bottom: 0.5rem !important;
     }
     
-    /* Compact text area */
+    /* Text area styling */
     .stTextArea textarea {
-        min-height: 120px !important;
-        max-height: 120px !important;
         font-size: 0.9rem !important;
         border-radius: 8px !important;
         border: 2px solid #e5e7eb !important;
         transition: border-color 0.2s;
+        resize: vertical;
     }
     
     .stTextArea textarea:focus {
@@ -85,22 +92,34 @@ def apply_custom_css():
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
     }
     
-    /* Styled file uploader */
+    /* File uploader styling */
     .uploadedFile {
         background: #f9fafb !important;
         border: 1px solid #e5e7eb !important;
         border-radius: 6px !important;
-        padding: 0.5rem !important;
-        margin: 0.25rem 0 !important;
-        font-size: 0.85rem !important;
+        padding: 0.6rem !important;
+        margin: 0.3rem 0 !important;
+        font-size: 0.875rem !important;
     }
     
-    /* Compact buttons */
+    [data-testid="stFileUploader"] {
+        background: #f9fafb;
+        border: 2px dashed #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        transition: border-color 0.2s;
+    }
+    
+    [data-testid="stFileUploader"]:hover {
+        border-color: #667eea;
+    }
+    
+    /* Buttons */
     .stButton > button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
         color: white !important;
         border: none !important;
-        padding: 0.5rem 2rem !important;
+        padding: 0.6rem 1.5rem !important;
         font-weight: 600 !important;
         border-radius: 8px !important;
         transition: transform 0.2s, box-shadow 0.2s !important;
@@ -109,19 +128,50 @@ def apply_custom_css():
     
     .stButton > button:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35) !important;
     }
     
-    /* Compact selectboxes and multiselect */
+    /* Selectboxes and multiselect */
     .stSelectbox > div > div,
     .stMultiSelect > div > div {
         font-size: 0.9rem !important;
-        min-height: 38px !important;
+        min-height: 40px !important;
+        border-radius: 8px !important;
     }
     
-    /* Results table styling */
-    .dataframe {
+    .stSelectbox label,
+    .stMultiSelect label {
         font-size: 0.85rem !important;
+        font-weight: 500 !important;
+        color: #374151 !important;
+        margin-bottom: 0.3rem !important;
+    }
+    
+    /* Metrics styling */
+    [data-testid="metric-container"] {
+        background: white;
+        border: 1px solid #e5e7eb;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        text-align: center;
+    }
+    
+    [data-testid="metric-container"] > div > div > div > div:first-child {
+        font-size: 0.8rem !important;
+        color: #6b7280 !important;
+        font-weight: 500 !important;
+    }
+    
+    [data-testid="metric-container"] > div > div > div > div:last-child {
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        color: #1f2937 !important;
+    }
+    
+    /* Results table */
+    .dataframe {
+        font-size: 0.875rem !important;
         border: none !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
         border-radius: 8px !important;
@@ -131,7 +181,7 @@ def apply_custom_css():
     .dataframe th {
         background: #f3f4f6 !important;
         font-weight: 600 !important;
-        padding: 0.75rem !important;
+        padding: 0.8rem !important;
         text-align: left !important;
         font-size: 0.85rem !important;
         color: #374151 !important;
@@ -139,29 +189,29 @@ def apply_custom_css():
     }
     
     .dataframe td {
-        padding: 0.6rem 0.75rem !important;
+        padding: 0.7rem 0.8rem !important;
         font-size: 0.85rem !important;
         border-bottom: 1px solid #f3f4f6 !important;
+        color: #374151 !important;
     }
     
-    /* Info boxes */
+    /* Info cards */
     .info-card {
         background: #f0f4ff;
         border-left: 4px solid #667eea;
-        padding: 0.75rem;
+        padding: 0.8rem;
         border-radius: 6px;
         margin-bottom: 1rem;
-        font-size: 0.85rem;
-        line-height: 1.4;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        color: #4c51bf;
     }
     
-    /* Compact expander */
-    .streamlit-expanderHeader {
-        font-size: 0.9rem !important;
-        font-weight: 600 !important;
-        background: #f9fafb !important;
+    /* Warning and info messages */
+    .stAlert {
+        padding: 0.8rem !important;
+        font-size: 0.875rem !important;
         border-radius: 8px !important;
-        padding: 0.5rem !important;
     }
     
     /* Hide unnecessary elements */
@@ -169,38 +219,35 @@ def apply_custom_css():
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* Responsive grid */
+    /* Column gap adjustment */
+    .row-widget.stHorizontal > div {
+        gap: 1.5rem;
+    }
+    
+    /* Results container */
+    [data-testid="column"]:last-child {
+        background: #fafbfc;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    /* Help text styling */
+    .stHelp {
+        font-size: 0.8rem !important;
+        color: #6b7280 !important;
+    }
+    
+    /* Responsive design */
     @media (max-width: 768px) {
         .block-container {
             padding-left: 1rem;
             padding-right: 1rem;
         }
-    }
-    
-    /* Metric styling */
-    [data-testid="metric-container"] {
-        background: white;
-        border: 1px solid #e5e7eb;
-        padding: 0.75rem;
-        border-radius: 8px;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    }
-    
-    [data-testid="metric-container"] > div > div > div > div:first-child {
-        font-size: 0.8rem !important;
-        color: #6b7280 !important;
-    }
-    
-    [data-testid="metric-container"] > div > div > div > div:last-child {
-        font-size: 1.25rem !important;
-        font-weight: 600 !important;
-    }
-    
-    /* Warning/Info messages */
-    .stAlert {
-        padding: 0.75rem !important;
-        font-size: 0.85rem !important;
-        border-radius: 8px !important;
+        
+        [data-testid="column"]:last-child {
+            margin-top: 2rem;
+        }
     }
     </style>
     """, unsafe_allow_html=True)
@@ -299,7 +346,14 @@ def count_tokens_openai(text: str, model: str) -> int:
     try:
         enc = tiktoken.encoding_for_model(model)
     except Exception:
-        enc = tiktoken.get_encoding("cl100k_base")
+        # Use the latest encoding for newer models
+        try:
+            if "gpt-4o" in model:
+                enc = tiktoken.get_encoding("o200k_base")
+            else:
+                enc = tiktoken.get_encoding("cl100k_base")
+        except:
+            return approximate_token_count(text)
     try:
         return len(enc.encode(text))
     except Exception:
@@ -310,7 +364,15 @@ def count_tokens_gemini_text(text: str, model: str) -> int:
     """Count tokens for Google Gemini models using Vertex AI when available."""
     try:
         from vertexai.preview.language_models import GenerativeModel
-        gm = GenerativeModel(model)
+
+        # Handle model name variations
+        if model.startswith("gemini-"):
+            # Use the model name as-is for newer models
+            gm = GenerativeModel(model)
+        else:
+            # Fallback for legacy names
+            gm = GenerativeModel("gemini-1.5-flash")
+
         request = [{"role": "user", "parts": [text]}]
         response = gm.count_tokens(request)
         return int(response.total_tokens)
@@ -536,193 +598,236 @@ def main() -> None:
     apply_custom_css()
 
     # Header section
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        st.markdown("# Token Counter Pro")
-        st.markdown(
-            '<p style="color: #6b7280; font-size: 0.95rem; margin-top: -0.5rem;">Analyze text, documents, and media with precision token counting</p>',
-            unsafe_allow_html=True
+    st.markdown("# Token Counter Pro")
+    st.markdown(
+        '<p style="color: #6b7280; font-size: 0.95rem; margin-top: -0.5rem; margin-bottom: 1.5rem;">Analyze text, documents, and media with precision token counting</p>',
+        unsafe_allow_html=True
+    )
+
+    # Main layout with text/file inputs on left, results on right
+    input_col, results_col = st.columns([1.2, 1], gap="large")
+
+    # Initialize variables that need to be accessible across columns
+    count_button = False
+    uploaded_files = None
+    input_text = ""
+    selected_models = []
+    openai_model = None
+    gemini_model = None
+    anthropic_model = None
+    anthropic_key = None
+
+    with input_col:
+        # Text input section
+        st.markdown("### 📝 Text Input")
+        input_text = st.text_area(
+            "Paste your text here",
+            placeholder="Enter or paste text to analyze...",
+            height=150,
+            label_visibility="collapsed"
         )
 
-    # Main layout with two columns
-    left_col, right_col = st.columns([1.5, 1], gap="large")
+        # File upload section (visible at same time)
+        st.markdown("### 📁 File Upload",
+                    help="Upload multiple files to analyze together")
+        uploaded_files = st.file_uploader(
+            "Drop files or click to browse",
+            type=["txt", "md", "csv", "log", "pdf", "docx", "png", "jpg",
+                  "jpeg", "bmp", "gif", "wav", "mp4", "mov", "avi", "mkv",
+                  "wmv", "flv"],
+            accept_multiple_files=True,
+            label_visibility="collapsed"
+        )
+        if uploaded_files:
+            st.markdown(f'<div class="info-card">📎 {len(uploaded_files)} file(s) uploaded</div>',
+                        unsafe_allow_html=True)
 
-    with left_col:
-        # Input section
-        st.markdown("### 📝 Input")
+        # Settings section below inputs
+        st.markdown("### ⚙️ Token Counter Settings")
+        settings_container = st.container()
 
-        # Tabs for input methods
-        tab1, tab2 = st.tabs(["Text Input", "File Upload"])
-
-        with tab1:
-            input_text = st.text_area(
-                "Paste your text here",
-                placeholder="Enter or paste text to analyze...",
-                height=120,
-                label_visibility="collapsed"
-            )
-
-        with tab2:
-            uploaded_files = st.file_uploader(
-                "Drop files or click to browse",
-                type=["txt", "md", "csv", "log", "pdf", "docx", "png", "jpg",
-                      "jpeg", "bmp", "gif", "wav", "mp4", "mov", "avi", "mkv",
-                      "wmv", "flv"],
-                accept_multiple_files=True,
-                label_visibility="collapsed"
-            )
-            if uploaded_files:
-                st.markdown(f'<div class="info-card">📎 {len(uploaded_files)} file(s) uploaded</div>',
-                            unsafe_allow_html=True)
-
-    with right_col:
-        # Settings section in an expander
-        with st.expander("⚙️ **Token Counter Settings**", expanded=True):
+        with settings_container:
+            # Model selection
             selected_models = st.multiselect(
-                "Active Tokenizers",
+                "Select tokenizers to use",
                 ["OpenAI", "Gemini", "Anthropic"],
                 default=["OpenAI", "Gemini"],
                 label_visibility="visible"
             )
 
-            # Model-specific settings in columns
-            if selected_models:
-                model_cols = st.columns(len(selected_models))
+            # Model-specific settings
+            openai_model = None
+            gemini_model = None
+            anthropic_model = None
+            anthropic_key = None
 
-                openai_model = None
-                gemini_model = None
-                anthropic_model = None
-                anthropic_key = None
+            if selected_models:
+                # Create columns for model dropdowns
+                if len(selected_models) == 1:
+                    col1, col2 = st.columns([1, 2])
+                    model_cols = [col1]
+                elif len(selected_models) == 2:
+                    col1, col2 = st.columns(2)
+                    model_cols = [col1, col2]
+                else:
+                    model_cols = st.columns(3)
 
                 for idx, model in enumerate(selected_models):
                     with model_cols[idx]:
                         if model == "OpenAI":
                             openai_model = st.selectbox(
-                                "OpenAI",
-                                ["gpt-4o", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
-                                index=0,
-                                label_visibility="visible"
+                                "OpenAI Model",
+                                ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo",
+                                    "gpt-4", "gpt-3.5-turbo"],
+                                index=0
                             )
                         elif model == "Gemini":
                             gemini_model = st.selectbox(
-                                "Gemini",
-                                ["gemini-1.5-pro-001", "gemini-1.5-flash-001",
-                                 "gemini-pro", "gemini-1.0-pro"],
-                                index=0,
-                                label_visibility="visible"
+                                "Gemini Model",
+                                ["gemini-2.5-pro-001", "gemini-2.5-flash-001",
+                                 "gemini-2.0-flash-001", "gemini-1.5-pro-001",
+                                 "gemini-1.5-flash-001"],
+                                index=1
                             )
                         elif model == "Anthropic":
                             anthropic_model = st.selectbox(
-                                "Anthropic",
-                                ["claude-3-opus-20240229", "claude-3-sonnet-20240229",
-                                 "claude-3-haiku-20240229"],
-                                index=1,
-                                label_visibility="visible"
+                                "Anthropic Model",
+                                ["claude-opus-4-20250514", "claude-sonnet-4-20250514",
+                                 "claude-3.7-sonnet-20250219", "claude-3-opus-20240229",
+                                 "claude-3-sonnet-20240229", "claude-3-haiku-20240307"],
+                                index=1
                             )
 
+            # API key for Anthropic (if selected)
             if "Anthropic" in selected_models:
                 anthropic_key = st.text_input(
-                    "API Key (optional)",
+                    "Anthropic API Key (optional)",
                     type="password",
-                    placeholder="sk-...",
-                    label_visibility="visible"
+                    placeholder="sk-ant-...",
+                    help="Required for accurate Anthropic token counting"
                 ) or None
 
-        # Count button
-        count_button = st.button("🚀 Count Tokens", use_container_width=True)
+            # Count button on the same row as settings
+            button_col1, button_col2 = st.columns([2, 1])
+            with button_col2:
+                count_button = st.button(
+                    "🚀 Count Tokens", use_container_width=True, type="primary")
 
-    # Results section
-    if count_button:
-        temp_dir = os.path.join(os.path.dirname(__file__), "_temp")
-        os.makedirs(temp_dir, exist_ok=True)
+    with results_col:
 
-        # Process inputs
-        results: List[TokenCounts] = []
+    with results_col:
+        # Results section - display when button is clicked
+        if count_button:
+            temp_dir = os.path.join(os.path.dirname(__file__), "_temp")
+            os.makedirs(temp_dir, exist_ok=True)
 
-        if input_text:
-            tc = TokenCounts(
-                name="Text Input",
-                words=count_words(input_text),
-                characters=count_characters(input_text),
-            )
-            if "OpenAI" in selected_models and openai_model:
-                tc.openai_tokens = count_tokens_openai(
-                    input_text, openai_model)
-            if "Gemini" in selected_models and gemini_model:
-                tc.gemini_tokens = count_tokens_gemini_text(
-                    input_text, gemini_model)
-            if "Anthropic" in selected_models and anthropic_model:
-                tc.anthropic_tokens = count_tokens_anthropic(
-                    input_text, anthropic_model, anthropic_key)
-            results.append(tc)
+            # Process inputs - combine text and files
+            results: List[TokenCounts] = []
 
-        for uf in uploaded_files or []:
-            counts = process_uploaded_file(
-                uf, selected_models, openai_model, gemini_model,
-                anthropic_model, anthropic_key, temp_dir
-            )
-            results.append(counts)
+            # Process text input
+            if input_text:
+                tc = TokenCounts(
+                    name="Text Input",
+                    words=count_words(input_text),
+                    characters=count_characters(input_text),
+                )
+                if "OpenAI" in selected_models and openai_model:
+                    tc.openai_tokens = count_tokens_openai(
+                        input_text, openai_model)
+                if "Gemini" in selected_models and gemini_model:
+                    tc.gemini_tokens = count_tokens_gemini_text(
+                        input_text, gemini_model)
+                if "Anthropic" in selected_models and anthropic_model:
+                    tc.anthropic_tokens = count_tokens_anthropic(
+                        input_text, anthropic_model, anthropic_key)
+                results.append(tc)
 
-        if results:
-            st.markdown("---")
-            st.markdown("### 📊 Results")
+            # Process uploaded files
+            for uf in uploaded_files or []:
+                counts = process_uploaded_file(
+                    uf, selected_models, openai_model, gemini_model,
+                    anthropic_model, anthropic_key, temp_dir
+                )
+                results.append(counts)
 
-            # Summary metrics
-            total_words = sum(r.words for r in results)
-            total_chars = sum(r.characters for r in results)
+            if results:
+                st.markdown("### 📊 Results")
 
-            metric_cols = st.columns(5)
-            with metric_cols[0]:
-                st.metric("Total Words", f"{total_words:,}")
-            with metric_cols[1]:
-                st.metric("Total Characters", f"{total_chars:,}")
+                # Summary metrics
+                total_words = sum(r.words for r in results)
+                total_chars = sum(r.characters for r in results)
 
-            # Show model-specific totals
-            if "OpenAI" in selected_models:
-                total_openai = sum(r.openai_tokens or 0 for r in results)
-                with metric_cols[2]:
-                    st.metric("OpenAI Tokens", f"{total_openai:,}")
+                # Combined totals section
+                st.markdown("#### Combined Totals")
 
-            if "Gemini" in selected_models:
-                total_gemini = sum(r.gemini_tokens or 0 for r in results)
-                with metric_cols[3]:
-                    st.metric("Gemini Tokens", f"{total_gemini:,}")
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric("Total Words", f"{total_words:,}")
+                with col2:
+                    st.metric("Total Characters", f"{total_chars:,}")
 
-            if "Anthropic" in selected_models:
-                total_anthropic = sum(r.anthropic_tokens or 0 for r in results)
-                with metric_cols[4]:
-                    st.metric("Anthropic Tokens", f"{total_anthropic:,}")
+                # Model-specific totals
+                if selected_models:
+                    model_metrics = st.columns(len(selected_models))
 
-            # Detailed results table
-            st.markdown("#### Detailed Breakdown")
+                    if "OpenAI" in selected_models:
+                        total_openai = sum(
+                            r.openai_tokens or 0 for r in results)
+                        idx = selected_models.index("OpenAI")
+                        with model_metrics[idx]:
+                            st.metric("OpenAI Tokens", f"{total_openai:,}")
 
-            # Convert to DataFrame for better display
-            import pandas as pd
+                    if "Gemini" in selected_models:
+                        total_gemini = sum(
+                            r.gemini_tokens or 0 for r in results)
+                        idx = selected_models.index("Gemini")
+                        with model_metrics[idx]:
+                            st.metric("Gemini Tokens", f"{total_gemini:,}")
 
-            table_data = []
-            for r in results:
-                row = {
-                    "📄 Source": r.name,
-                    "Words": f"{r.words:,}",
-                    "Characters": f"{r.characters:,}"
-                }
-                if "OpenAI" in selected_models:
-                    row["OpenAI"] = f"{r.openai_tokens:,}" if r.openai_tokens else "—"
-                if "Gemini" in selected_models:
-                    row["Gemini"] = f"{r.gemini_tokens:,}" if r.gemini_tokens else "—"
-                if "Anthropic" in selected_models:
-                    row["Anthropic"] = f"{r.anthropic_tokens:,}" if r.anthropic_tokens else "—"
-                table_data.append(row)
+                    if "Anthropic" in selected_models:
+                        total_anthropic = sum(
+                            r.anthropic_tokens or 0 for r in results)
+                        idx = selected_models.index("Anthropic")
+                        with model_metrics[idx]:
+                            st.metric("Anthropic Tokens",
+                                      f"{total_anthropic:,}")
 
-            df = pd.DataFrame(table_data)
-            st.dataframe(
-                df,
-                use_container_width=True,
-                hide_index=True,
-                height=min(300, 50 + len(df) * 35)
-            )
+                # Detailed breakdown
+                if len(results) > 1:
+                    st.markdown("#### Breakdown by Source")
+
+                    # Convert to DataFrame for better display
+                    import pandas as pd
+
+                    table_data = []
+                    for r in results:
+                        row = {
+                            "Source": r.name[:30] + "..." if len(r.name) > 30 else r.name,
+                            "Words": f"{r.words:,}",
+                            "Chars": f"{r.characters:,}"
+                        }
+                        if "OpenAI" in selected_models:
+                            row["OpenAI"] = f"{r.openai_tokens:,}" if r.openai_tokens else "—"
+                        if "Gemini" in selected_models:
+                            row["Gemini"] = f"{r.gemini_tokens:,}" if r.gemini_tokens else "—"
+                        if "Anthropic" in selected_models:
+                            row["Anthropic"] = f"{r.anthropic_tokens:,}" if r.anthropic_tokens else "—"
+                        table_data.append(row)
+
+                    df = pd.DataFrame(table_data)
+                    st.dataframe(
+                        df,
+                        use_container_width=True,
+                        hide_index=True,
+                        height=min(250, 40 + len(df) * 35)
+                    )
+            else:
+                st.warning("⚠️ Please enter text or upload files to analyze")
         else:
-            st.warning("⚠️ Please enter text or upload files to analyze")
+            # Show placeholder when no results
+            st.markdown("### 📊 Results")
+            st.info(
+                "Enter text and/or upload files, then click 'Count Tokens' to see results here")
 
 
 if __name__ == "__main__":

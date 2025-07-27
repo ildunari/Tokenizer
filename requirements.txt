@@ -1,15 +1,17 @@
 # Core dependencies
-streamlit>=1.28.0
+streamlit>=1.32.0
 Pillow>=10.0.0
 PyPDF2>=3.0.0
 pandas>=2.0.0
 
+# Tokenization libraries
+tiktoken>=0.7.0  # For OpenAI models
+
 # Optional but recommended dependencies
-opencv-python>=4.8.0
-requests>=2.31.0
-tiktoken>=0.5.0
-google-cloud-aiplatform>=1.57.0
-anthropic>=0.7.0
-python-docx>=0.8.11
+opencv-python>=4.8.0  # For video processing
+requests>=2.31.0  # For Context7 integration
+google-cloud-aiplatform>=1.60.0  # For Gemini token counting
+anthropic>=0.25.0  # For Anthropic token counting
+python-docx>=1.0.0  # For DOCX file support
 
 # Note: wave is part of Python standard library, no need to install
