@@ -1,35 +1,8 @@
 """
-Token Counting Web Application
-================================
+Token Counting Web Application - Redesigned
+===========================================
 
-This Streamlit web application allows users to paste text or upload files and
-receive counts for words, characters and tokens.  In addition to simple counts
-the application can approximate token counts for three different families of
-language models—OpenAI, Google Gemini and Anthropic Claude.  Whenever
-possible the application attempts to use official tokenizers.  If a tokenizer
-library is not available in the execution environment, a fallback heuristic
-(`len(text) // 4`) is used.  The app also handles basic multimedia file
-types supported by Gemini’s token accounting rules: images are converted to
-their dimensions to determine the number of 768×768 tiles needed, video
-duration is extracted via OpenCV to estimate tokens at 263 tokens per second
-and WAV audio duration is measured to estimate tokens at 32 tokens per
-second.  Other audio formats are ignored unless the environment contains
-additional decoding libraries.
-
-The code also includes optional integration with the Context7 Model Context
-Protocol (MCP) service.  If the environment can reach the Context7 MCP
-endpoint it will resolve library names and fetch up‑to‑date documentation for
-the libraries used in this application.  These docs are not displayed to the
-user but can be inspected via the return value of `get_context7_docs()`.
-
-To run this application locally you need to install the required
-dependencies listed in the accompanying `requirements.txt` file.  Once
-installed, execute the app with:
-
-```
-streamlit run app.py
-```
-
+A modern, compact Streamlit web application for token counting with improved aesthetics.
 """
 
 import contextlib
@@ -45,30 +18,197 @@ import streamlit as st
 from PIL import Image
 import PyPDF2
 
-# Optional imports.  These may not be available in all environments.  The
-# application gracefully falls back when they are missing.
+# Optional imports
 try:
-    import cv2  # type: ignore[import]
+    import cv2
 except Exception:
-    cv2 = None  # type: ignore[assignment]
+    cv2 = None
 
 try:
-    import wave  # standard library, used for WAV audio duration
+    import wave
 except Exception:
-    wave = None  # type: ignore[assignment]
+    wave = None
 
-# Context7 integration uses the requests library.  If this package is not
-# installed the function will silently return None.
 try:
-    import requests  # type: ignore[import]
+    import requests
 except Exception:
-    requests = None  # type: ignore[assignment]
+    requests = None
+
+
+# Apply custom CSS for modern design
+def apply_custom_css():
+    st.markdown("""
+    <style>
+    /* Modern color scheme and typography */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    * {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Compact header */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        max-width: 1400px;
+    }
+    
+    h1 {
+        font-size: 2rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 0.5rem !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    h3 {
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        color: #374151 !important;
+        margin-top: 1rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    /* Compact text area */
+    .stTextArea textarea {
+        min-height: 120px !important;
+        max-height: 120px !important;
+        font-size: 0.9rem !important;
+        border-radius: 8px !important;
+        border: 2px solid #e5e7eb !important;
+        transition: border-color 0.2s;
+    }
+    
+    .stTextArea textarea:focus {
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+    }
+    
+    /* Styled file uploader */
+    .uploadedFile {
+        background: #f9fafb !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 6px !important;
+        padding: 0.5rem !important;
+        margin: 0.25rem 0 !important;
+        font-size: 0.85rem !important;
+    }
+    
+    /* Compact buttons */
+    .stButton > button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border: none !important;
+        padding: 0.5rem 2rem !important;
+        font-weight: 600 !important;
+        border-radius: 8px !important;
+        transition: transform 0.2s, box-shadow 0.2s !important;
+        font-size: 0.95rem !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+    }
+    
+    /* Compact selectboxes and multiselect */
+    .stSelectbox > div > div,
+    .stMultiSelect > div > div {
+        font-size: 0.9rem !important;
+        min-height: 38px !important;
+    }
+    
+    /* Results table styling */
+    .dataframe {
+        font-size: 0.85rem !important;
+        border: none !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+    }
+    
+    .dataframe th {
+        background: #f3f4f6 !important;
+        font-weight: 600 !important;
+        padding: 0.75rem !important;
+        text-align: left !important;
+        font-size: 0.85rem !important;
+        color: #374151 !important;
+        border-bottom: 2px solid #e5e7eb !important;
+    }
+    
+    .dataframe td {
+        padding: 0.6rem 0.75rem !important;
+        font-size: 0.85rem !important;
+        border-bottom: 1px solid #f3f4f6 !important;
+    }
+    
+    /* Info boxes */
+    .info-card {
+        background: #f0f4ff;
+        border-left: 4px solid #667eea;
+        padding: 0.75rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+    
+    /* Compact expander */
+    .streamlit-expanderHeader {
+        font-size: 0.9rem !important;
+        font-weight: 600 !important;
+        background: #f9fafb !important;
+        border-radius: 8px !important;
+        padding: 0.5rem !important;
+    }
+    
+    /* Hide unnecessary elements */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    /* Responsive grid */
+    @media (max-width: 768px) {
+        .block-container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+    }
+    
+    /* Metric styling */
+    [data-testid="metric-container"] {
+        background: white;
+        border: 1px solid #e5e7eb;
+        padding: 0.75rem;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    
+    [data-testid="metric-container"] > div > div > div > div:first-child {
+        font-size: 0.8rem !important;
+        color: #6b7280 !important;
+    }
+    
+    [data-testid="metric-container"] > div > div > div > div:last-child {
+        font-size: 1.25rem !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Warning/Info messages */
+    .stAlert {
+        padding: 0.75rem !important;
+        font-size: 0.85rem !important;
+        border-radius: 8px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 
 @dataclass
 class TokenCounts:
     """Container for counting results for a single input."""
-
     name: str
     words: int
     characters: int
@@ -78,34 +218,11 @@ class TokenCounts:
 
 
 def get_context7_docs(library_name: str) -> Optional[str]:
-    """Fetch up‑to‑date documentation for a library using Context7 MCP.
-
-    The MCP server exposes two methods: ``resolve-library-id`` and
-    ``get-library-docs``.  This helper first resolves a Context7‑compatible
-    library identifier from a human friendly name then fetches the
-    corresponding documentation.  When an error occurs or the ``requests``
-    package is unavailable it returns None.  Documentation retrieval uses
-    JSON‑RPC over HTTP.  See Context7 docs for more details.
-
-    Parameters
-    ----------
-    library_name: str
-        The name of the library to resolve (e.g. ``tiktoken`` or
-        ``google-cloud-aiplatform``).
-
-    Returns
-    -------
-    Optional[str]
-        A markdown string containing the library documentation or None if
-        retrieval fails.
-    """
+    """Fetch up‑to‑date documentation for a library using Context7 MCP."""
     if requests is None:
         return None
     mcp_url = "https://mcp.context7.com/mcp"
     try:
-        # Resolve the library ID.  We need to use Server Sent Events (SSE)
-        # transport because the default response uses SSE frames.  Setting
-        # Accept to ``text/event-stream`` tells the server to stream events.
         resolve_payload = {
             "jsonrpc": "2.0",
             "id": 1,
@@ -126,21 +243,17 @@ def get_context7_docs(library_name: str) -> Optional[str]:
                     continue
                 line = line_bytes.decode("utf-8", errors="ignore")
                 if line.startswith("data:"):
-                    # Each SSE event line begins with ``data:`` followed by a JSON string.
                     data_str = line[len("data:"):].strip()
                     try:
                         data_json = json.loads(data_str)
                         result = data_json.get("result")
                         if isinstance(result, list) and result:
-                            # Use the first ID in the result list.
                             library_id = result[0]
                             break
                     except Exception:
                         continue
         if not library_id:
             return None
-        # Now fetch the documentation.  The ``get-library-docs`` method
-        # expects the resolved ID and optionally a topic and token limit.
         docs_payload = {
             "jsonrpc": "2.0",
             "id": 2,
@@ -156,16 +269,11 @@ def get_context7_docs(library_name: str) -> Optional[str]:
         data = resp2.json()
         return data.get("result")
     except Exception:
-        # In case of any network or JSON error return None.  The caller
-        # handles the absence of documentation gracefully.
         return None
 
 
 def count_words(text: str) -> int:
-    """Count the number of non‑whitespace token sequences (words).
-
-    Uses a regular expression to split on one or more whitespace characters.
-    """
+    """Count the number of non‑whitespace token sequences (words)."""
     tokens = re.findall(r"\S+", text or "")
     return len(tokens)
 
@@ -176,47 +284,21 @@ def count_characters(text: str) -> int:
 
 
 def approximate_token_count(text: str) -> int:
-    """Approximate token count by assuming one token per ~4 characters.
-
-    This heuristic is based on observations that GPT and Gemini tokens
-    average roughly four characters.  It acts as a fallback when a real
-    tokenizer library (e.g. tiktoken, sentencepiece or anthropic) is not
-    available.  Always returns at least one token for non‑empty input.
-    """
+    """Approximate token count by assuming one token per ~4 characters."""
     if not text:
         return 0
     return max(1, len(text) // 4)
 
 
 def count_tokens_openai(text: str, model: str) -> int:
-    """Count tokens for OpenAI models using tiktoken when available.
-
-    If the tiktoken package cannot be imported or the model’s encoding is
-    unknown the function falls back to the approximate token heuristic.
-
-    Parameters
-    ----------
-    text: str
-        The text to tokenize.
-    model: str
-        An OpenAI model name such as ``gpt-4o`` or ``gpt-3.5-turbo``.  The
-        ``tiktoken.encoding_for_model`` function automatically maps model
-        names to encodings.
-
-    Returns
-    -------
-    int
-        The number of tokens in the given text.
-    """
+    """Count tokens for OpenAI models using tiktoken when available."""
     try:
-        import tiktoken  # type: ignore[import]
+        import tiktoken
     except Exception:
         return approximate_token_count(text)
     try:
-        # Use model specific encoding when available.
         enc = tiktoken.encoding_for_model(model)
     except Exception:
-        # Fallback to a common encoding if the model is unknown.
         enc = tiktoken.get_encoding("cl100k_base")
     try:
         return len(enc.encode(text))
@@ -225,98 +307,53 @@ def count_tokens_openai(text: str, model: str) -> int:
 
 
 def count_tokens_gemini_text(text: str, model: str) -> int:
-    """Count tokens for Google Gemini models using Vertex AI when available.
-
-    The Vertex AI SDK supports local tokenization starting from version
-    1.57.0 via the preview generative models.  If the SDK cannot be
-    imported or the model does not support token counting this function
-    falls back to the approximate heuristic.  Because the generative
-    models API may change, using Context7 to fetch up‑to‑date docs is
-    advised when deploying this app in production.
-    """
+    """Count tokens for Google Gemini models using Vertex AI when available."""
     try:
-        # Import inside the function to avoid import errors when the package
-        # is unavailable.
-        # type: ignore[import]
         from vertexai.preview.language_models import GenerativeModel
-
         gm = GenerativeModel(model)
-        # Compose a Gemini chat message.  A single user message can be
-        # represented as a list of dictionaries with ``role`` and ``parts``.
         request = [{"role": "user", "parts": [text]}]
         response = gm.count_tokens(request)
-        # The response object has a ``total_tokens`` attribute.
         return int(response.total_tokens)
     except Exception:
         return approximate_token_count(text)
 
 
 def count_tokens_anthropic(text: str, model: str, api_key: Optional[str]) -> int:
-    """Count tokens for Anthropic Claude models via their API.
-
-    When an API key is provided the function calls the official ``count_tokens``
-    endpoint using the Anthropic Python client.  If no key is supplied or the
-    client cannot be imported the function falls back to the approximate
-    heuristic.  Note that calling the Anthropic API will consume network
-    requests and should be used sparingly.
-    """
+    """Count tokens for Anthropic Claude models via their API."""
     if not api_key:
         return approximate_token_count(text)
     try:
-        import anthropic  # type: ignore[import]
+        import anthropic
     except Exception:
         return approximate_token_count(text)
     try:
         client = anthropic.Anthropic(api_key=api_key)
-        # The Claude API expects messages as a list of dicts.  Only the
-        # ``user`` role is used here.
         messages = [{"role": "user", "content": text}]
         response = client.messages.count_tokens(model=model, messages=messages)
-        # The API returns a dict with an ``input_tokens`` field.
         if isinstance(response, dict) and "input_tokens" in response:
             return int(response["input_tokens"])
-        # Some versions return an object with attributes.
         return int(getattr(response, "input_tokens"))
     except Exception:
         return approximate_token_count(text)
 
 
 def gemini_tokens_image(image: Image.Image) -> int:
-    """Compute Gemini token count for an image based on its dimensions.
-
-    According to Google’s token accounting rules, images up to 384×384
-    contribute 258 tokens.  Larger images are tiled into 768×768 patches
-    and each tile counts as 258 tokens.  PDFs are treated like images at
-    the page level and processed separately.  See Google’s docs for
-    details【617856474601913†L532-L548】.
-    """
+    """Compute Gemini token count for an image based on its dimensions."""
     width, height = image.size
-    # Small images count as a single tile of 258 tokens.
     if width <= 384 and height <= 384:
         return 258
-    # Larger images are divided into 768×768 tiles.  Compute the number
-    # of tiles in each dimension by rounding up.
     tiles_x = (width + 767) // 768
     tiles_y = (height + 767) // 768
     return tiles_x * tiles_y * 258
 
 
 def gemini_tokens_pdf_page() -> int:
-    """Return the Gemini token cost for a PDF page.
-
-    Google treats PDF pages similarly to images and assigns 258 tokens per
-    page for billing purposes【617856474601913†L532-L553】.  This constant
-    simplifies PDF token counting without requiring image conversion.
-    """
+    """Return the Gemini token cost for a PDF page."""
     return 258
 
 
 def gemini_tokens_video(file_path: str) -> int:
-    """Compute Gemini token count for a video using OpenCV to extract duration.
-
-    Videos contribute 263 tokens per second【617856474601913†L542-L548】.  If
-    OpenCV is not available or the file cannot be opened, returns zero.
-    """
+    """Compute Gemini token count for a video using OpenCV to extract duration."""
     if cv2 is None:
         return 0
     cap = cv2.VideoCapture(file_path)
@@ -334,13 +371,7 @@ def gemini_tokens_video(file_path: str) -> int:
 
 
 def gemini_tokens_audio(file_path: str) -> int:
-    """Compute Gemini token count for an audio file (WAV only) via wave module.
-
-    Audio contributes 32 tokens per second【617856474601913†L542-L548】.  Only
-    WAV format is supported because Python’s standard ``wave`` module can
-    read WAV files.  Other audio formats return zero tokens unless a
-    decoding library is available.
-    """
+    """Compute Gemini token count for an audio file (WAV only) via wave module."""
     if wave is None:
         return 0
     try:
@@ -354,20 +385,8 @@ def gemini_tokens_audio(file_path: str) -> int:
 
 
 def extract_text_from_pdf(file: Any) -> str:
-    """Extract all text from a PDF using PyPDF2.
-
-    Parameters
-    ----------
-    file: Any
-        A binary file object returned from Streamlit’s file uploader.
-
-    Returns
-    -------
-    str
-        Concatenated text from all pages of the PDF.
-    """
+    """Extract all text from a PDF using PyPDF2."""
     try:
-        # PyPDF2 can accept a file‑like object directly.
         pdf_reader = PyPDF2.PdfReader(file)
         text = ""
         for page in pdf_reader.pages:
@@ -379,12 +398,9 @@ def extract_text_from_pdf(file: Any) -> str:
 
 
 def extract_text_from_docx(file: Any) -> str:
-    """Extract text from a DOCX file using python‑docx.
-
-    Returns an empty string if python‑docx is unavailable or parsing fails.
-    """
+    """Extract text from a DOCX file using python‑docx."""
     try:
-        import docx  # type: ignore[import]
+        import docx
     except Exception:
         return ""
     try:
@@ -403,48 +419,16 @@ def process_uploaded_file(
     anthropic_key: Optional[str],
     temp_dir: str,
 ) -> TokenCounts:
-    """Process an uploaded file and compute counts.
-
-    Based on the file extension this function decides how to extract text or
-    dimensional information.  Textual files (TXT, PDF, DOCX) produce both
-    word and character counts as well as tokens for each selected model.  Image
-    files produce only Gemini tokens because other models do not currently
-    accept images via purely offline tokenization.  Video and audio files
-    similarly produce Gemini token counts.  Unsupported file types yield
-    zero counts for words and characters.
-
-    Parameters
-    ----------
-    file: Any
-        The uploaded file object from Streamlit.
-    selected_models: List[str]
-        A list of tokenizers selected by the user.
-    openai_model: Optional[str]
-        The OpenAI model name to use.
-    gemini_model: Optional[str]
-        The Gemini model name to use.
-    anthropic_model: Optional[str]
-        The Anthropic model name to use.
-    anthropic_key: Optional[str]
-        The user‑supplied API key for Anthropic.
-    temp_dir: str
-        Directory on disk where temporary files can be written.
-
-    Returns
-    -------
-    TokenCounts
-        A record with counts for the file.
-    """
+    """Process an uploaded file and compute counts."""
     filename = file.name
     name_lower = filename.lower()
     ext = os.path.splitext(name_lower)[1]
-    # Initialize counts with zeros.  We fill fields as appropriate below.
     counts = TokenCounts(name=filename, words=0, characters=0)
-    # Process text files.
+
+    # Process text files
     if ext in {".txt", ".md", ".csv", ".log"}:
         try:
             text_bytes = file.read()
-            # Attempt to decode using UTF‑8.  Fallback to Latin‑1 if decoding fails.
             try:
                 text = text_bytes.decode("utf-8")
             except Exception:
@@ -461,10 +445,10 @@ def process_uploaded_file(
             counts.anthropic_tokens = count_tokens_anthropic(
                 text, anthropic_model, anthropic_key)
         return counts
-    # Process PDF files.
+
+    # Process PDF files
     if ext == ".pdf":
         pdf_text = extract_text_from_pdf(file)
-        # Reset file pointer so we can reuse the same object for page counting
         try:
             file.seek(0)
         except Exception:
@@ -474,8 +458,6 @@ def process_uploaded_file(
         if "OpenAI" in selected_models and openai_model:
             counts.openai_tokens = count_tokens_openai(pdf_text, openai_model)
         if "Gemini" in selected_models and gemini_model:
-            # Each PDF page contributes 258 tokens.  We measure the number of
-            # pages from the PDF reader.
             try:
                 pdf_reader = PyPDF2.PdfReader(file)
                 pages = len(pdf_reader.pages)
@@ -486,7 +468,8 @@ def process_uploaded_file(
             counts.anthropic_tokens = count_tokens_anthropic(
                 pdf_text, anthropic_model, anthropic_key)
         return counts
-    # Process DOCX files.
+
+    # Process DOCX files
     if ext == ".docx":
         doc_text = extract_text_from_docx(file)
         counts.words = count_words(doc_text)
@@ -500,7 +483,8 @@ def process_uploaded_file(
             counts.anthropic_tokens = count_tokens_anthropic(
                 doc_text, anthropic_model, anthropic_key)
         return counts
-    # Process images.
+
+    # Process images
     if ext in {".png", ".jpg", ".jpeg", ".bmp", ".gif"}:
         try:
             image = Image.open(file)
@@ -508,25 +492,22 @@ def process_uploaded_file(
                 counts.gemini_tokens = gemini_tokens_image(image)
         except Exception:
             pass
-        # Images have no text; words and characters remain zero.  Other models
-        # cannot compute tokens offline without OCR so we leave their counts
-        # as None.
         return counts
-    # Process video files.  Save to a temporary file so OpenCV can access it.
+
+    # Process video files
     if ext in {".mp4", ".mov", ".avi", ".mkv", ".wmv", ".flv"}:
         if cv2 is not None and "Gemini" in selected_models and gemini_model:
-            # Write the bytes to disk.
             temp_path = os.path.join(temp_dir, filename)
             with open(temp_path, "wb") as tmp:
                 tmp.write(file.read())
             counts.gemini_tokens = gemini_tokens_video(temp_path)
-            # Clean up the temp file after reading.
             try:
                 os.remove(temp_path)
             except Exception:
                 pass
         return counts
-    # Process audio files.  We only support WAV due to the wave module.
+
+    # Process audio files
     if ext in {".wav"}:
         if wave is not None and "Gemini" in selected_models and gemini_model:
             temp_path = os.path.join(temp_dir, filename)
@@ -538,122 +519,129 @@ def process_uploaded_file(
             except Exception:
                 pass
         return counts
-    # If file type is unknown, we leave counts at zero/None.
+
     return counts
 
 
 def main() -> None:
     """Entry point for the Streamlit application."""
-    st.set_page_config(page_title="Token Counter",
-                       page_icon="📏", layout="wide")
-    st.title("Token Counter and Analyzer")
-    st.markdown(
-        """
-        **Overview**
-        
-        This application allows you to paste text or upload files and see
-        statistics on their content.  It computes:
-        
-        - **Words**: number of whitespace‑separated sequences
-        - **Characters**: total number of characters
-        - **Tokens**: approximate counts for OpenAI GPT, Google Gemini and Anthropic Claude models
-        
-        When the necessary libraries are installed, the counts use the same
-        tokenizer implementations as the respective platforms; otherwise a simple
-        heuristic (four characters per token) is used.  For Gemini, images and
-        multimedia files are supported and follow Google’s documented token
-        accounting rules【617856474601913†L532-L548】.  Token counts for Anthropic
-        models can use your API key if supplied; if no key is provided a
-        heuristic is used.  Use the control panel below to configure the
-        tokenizers.
-        """
+    st.set_page_config(
+        page_title="Token Counter Pro",
+        page_icon="🎯",
+        layout="wide",
+        initial_sidebar_state="collapsed"
     )
 
-    # Input text area
-    input_text = st.text_area("Paste text here", height=200)
-    uploaded_files = st.file_uploader(
-        "Upload files (text, PDF, DOCX, images, audio, video)",
-        type=[
-            "txt",
-            "md",
-            "csv",
-            "log",
-            "pdf",
-            "docx",
-            "png",
-            "jpg",
-            "jpeg",
-            "bmp",
-            "gif",
-            "wav",
-            "mp4",
-            "mov",
-            "avi",
-            "mkv",
-            "wmv",
-            "flv",
-        ],
-        accept_multiple_files=True,
-    )
+    # Apply custom CSS
+    apply_custom_css()
 
-    st.markdown("### Tokenizer Settings")
-    selected_models = st.multiselect(
-        "Select tokenizers to use", ["OpenAI", "Gemini", "Anthropic"], default=["OpenAI", "Gemini"]
-    )
-    # Options for each model family
-    openai_model = None
-    gemini_model = None
-    anthropic_model = None
-    anthropic_key: Optional[str] = None
-    if "OpenAI" in selected_models:
-        openai_model = st.selectbox(
-            "OpenAI model", ["gpt-4o", "gpt-4-turbo",
-                             "gpt-4", "gpt-3.5-turbo"],
-            index=0,
-            help="Model name passed to tiktoken for encoding."
+    # Header section
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        st.markdown("# Token Counter Pro")
+        st.markdown(
+            '<p style="color: #6b7280; font-size: 0.95rem; margin-top: -0.5rem;">Analyze text, documents, and media with precision token counting</p>',
+            unsafe_allow_html=True
         )
-    if "Gemini" in selected_models:
-        gemini_model = st.selectbox(
-            "Gemini model", [
-                "gemini-1.5-pro-001",
-                "gemini-1.5-flash-001",
-                "gemini-pro",  # alias for older names
-                "gemini-1.0-pro",
-            ],
-            index=0,
-            help="Model name passed to Vertex AI tokenization."
-        )
-    if "Anthropic" in selected_models:
-        anthropic_model = st.selectbox(
-            "Anthropic model", [
-                "claude-3-opus-20240229",
-                "claude-3-sonnet-20240229",
-                "claude-3-haiku-20240229",
-            ],
-            index=1,
-            help="Model name used for Anthropic Claude token counting."
-        )
-        anthropic_key = st.text_input(
-            "Anthropic API key (optional)", value="", type="password", help="Used for exact Claude token counting."
-        ) or None
 
-    # Temporary directory for media files
-    temp_dir = os.path.join(os.path.dirname(__file__), "_temp")
-    os.makedirs(temp_dir, exist_ok=True)
+    # Main layout with two columns
+    left_col, right_col = st.columns([1.5, 1], gap="large")
 
-    if st.button("Count Tokens"):
-        # Optionally fetch up‑to‑date docs via Context7.  This is a
-        # demonstration of how the tool can be integrated; the docs are not
-        # displayed but could be used for validation or debugging.
-        with st.spinner("Resolving documentation via Context7..."):
-            _ = get_context7_docs("tiktoken")
-            _ = get_context7_docs("google-cloud-aiplatform")
-            _ = get_context7_docs("anthropic")
-        # Process text input
+    with left_col:
+        # Input section
+        st.markdown("### 📝 Input")
+
+        # Tabs for input methods
+        tab1, tab2 = st.tabs(["Text Input", "File Upload"])
+
+        with tab1:
+            input_text = st.text_area(
+                "Paste your text here",
+                placeholder="Enter or paste text to analyze...",
+                height=120,
+                label_visibility="collapsed"
+            )
+
+        with tab2:
+            uploaded_files = st.file_uploader(
+                "Drop files or click to browse",
+                type=["txt", "md", "csv", "log", "pdf", "docx", "png", "jpg",
+                      "jpeg", "bmp", "gif", "wav", "mp4", "mov", "avi", "mkv",
+                      "wmv", "flv"],
+                accept_multiple_files=True,
+                label_visibility="collapsed"
+            )
+            if uploaded_files:
+                st.markdown(f'<div class="info-card">📎 {len(uploaded_files)} file(s) uploaded</div>',
+                            unsafe_allow_html=True)
+
+    with right_col:
+        # Settings section in an expander
+        with st.expander("⚙️ **Token Counter Settings**", expanded=True):
+            selected_models = st.multiselect(
+                "Active Tokenizers",
+                ["OpenAI", "Gemini", "Anthropic"],
+                default=["OpenAI", "Gemini"],
+                label_visibility="visible"
+            )
+
+            # Model-specific settings in columns
+            if selected_models:
+                model_cols = st.columns(len(selected_models))
+
+                openai_model = None
+                gemini_model = None
+                anthropic_model = None
+                anthropic_key = None
+
+                for idx, model in enumerate(selected_models):
+                    with model_cols[idx]:
+                        if model == "OpenAI":
+                            openai_model = st.selectbox(
+                                "OpenAI",
+                                ["gpt-4o", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
+                                index=0,
+                                label_visibility="visible"
+                            )
+                        elif model == "Gemini":
+                            gemini_model = st.selectbox(
+                                "Gemini",
+                                ["gemini-1.5-pro-001", "gemini-1.5-flash-001",
+                                 "gemini-pro", "gemini-1.0-pro"],
+                                index=0,
+                                label_visibility="visible"
+                            )
+                        elif model == "Anthropic":
+                            anthropic_model = st.selectbox(
+                                "Anthropic",
+                                ["claude-3-opus-20240229", "claude-3-sonnet-20240229",
+                                 "claude-3-haiku-20240229"],
+                                index=1,
+                                label_visibility="visible"
+                            )
+
+            if "Anthropic" in selected_models:
+                anthropic_key = st.text_input(
+                    "API Key (optional)",
+                    type="password",
+                    placeholder="sk-...",
+                    label_visibility="visible"
+                ) or None
+
+        # Count button
+        count_button = st.button("🚀 Count Tokens", use_container_width=True)
+
+    # Results section
+    if count_button:
+        temp_dir = os.path.join(os.path.dirname(__file__), "_temp")
+        os.makedirs(temp_dir, exist_ok=True)
+
+        # Process inputs
         results: List[TokenCounts] = []
+
         if input_text:
             tc = TokenCounts(
-                name="Input Text",
+                name="Text Input",
                 words=count_words(input_text),
                 characters=count_characters(input_text),
             )
@@ -667,38 +655,74 @@ def main() -> None:
                 tc.anthropic_tokens = count_tokens_anthropic(
                     input_text, anthropic_model, anthropic_key)
             results.append(tc)
-        # Process uploaded files
+
         for uf in uploaded_files or []:
             counts = process_uploaded_file(
-                uf,
-                selected_models,
-                openai_model,
-                gemini_model,
-                anthropic_model,
-                anthropic_key,
-                temp_dir,
+                uf, selected_models, openai_model, gemini_model,
+                anthropic_model, anthropic_key, temp_dir
             )
             results.append(counts)
-        # Display results as a table
+
         if results:
-            # Convert list of dataclasses to list of dicts for Streamlit table.
-            table: List[Dict[str, Any]] = []
+            st.markdown("---")
+            st.markdown("### 📊 Results")
+
+            # Summary metrics
+            total_words = sum(r.words for r in results)
+            total_chars = sum(r.characters for r in results)
+
+            metric_cols = st.columns(5)
+            with metric_cols[0]:
+                st.metric("Total Words", f"{total_words:,}")
+            with metric_cols[1]:
+                st.metric("Total Characters", f"{total_chars:,}")
+
+            # Show model-specific totals
+            if "OpenAI" in selected_models:
+                total_openai = sum(r.openai_tokens or 0 for r in results)
+                with metric_cols[2]:
+                    st.metric("OpenAI Tokens", f"{total_openai:,}")
+
+            if "Gemini" in selected_models:
+                total_gemini = sum(r.gemini_tokens or 0 for r in results)
+                with metric_cols[3]:
+                    st.metric("Gemini Tokens", f"{total_gemini:,}")
+
+            if "Anthropic" in selected_models:
+                total_anthropic = sum(r.anthropic_tokens or 0 for r in results)
+                with metric_cols[4]:
+                    st.metric("Anthropic Tokens", f"{total_anthropic:,}")
+
+            # Detailed results table
+            st.markdown("#### Detailed Breakdown")
+
+            # Convert to DataFrame for better display
+            import pandas as pd
+
+            table_data = []
             for r in results:
-                table.append(
-                    {
-                        "Name": r.name,
-                        "Words": r.words,
-                        "Characters": r.characters,
-                        "OpenAI Tokens": r.openai_tokens,
-                        "Gemini Tokens": r.gemini_tokens,
-                        "Anthropic Tokens": r.anthropic_tokens,
-                    }
-                )
-            st.markdown("### Results")
-            st.table(table)
+                row = {
+                    "📄 Source": r.name,
+                    "Words": f"{r.words:,}",
+                    "Characters": f"{r.characters:,}"
+                }
+                if "OpenAI" in selected_models:
+                    row["OpenAI"] = f"{r.openai_tokens:,}" if r.openai_tokens else "—"
+                if "Gemini" in selected_models:
+                    row["Gemini"] = f"{r.gemini_tokens:,}" if r.gemini_tokens else "—"
+                if "Anthropic" in selected_models:
+                    row["Anthropic"] = f"{r.anthropic_tokens:,}" if r.anthropic_tokens else "—"
+                table_data.append(row)
+
+            df = pd.DataFrame(table_data)
+            st.dataframe(
+                df,
+                use_container_width=True,
+                hide_index=True,
+                height=min(300, 50 + len(df) * 35)
+            )
         else:
-            st.warning(
-                "Please enter text or upload at least one supported file.")
+            st.warning("⚠️ Please enter text or upload files to analyze")
 
 
 if __name__ == "__main__":
