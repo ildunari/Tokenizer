@@ -716,10 +716,6 @@ def main() -> None:
     with results_col:
         # Results section - display when button is clicked
         if count_button:
-
-    with results_col:
-        # Results section - display when button is clicked
-        if count_button:
             temp_dir = os.path.join(os.path.dirname(__file__), "_temp")
             os.makedirs(temp_dir, exist_ok=True)
 
