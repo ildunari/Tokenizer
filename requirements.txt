@@ -1,1 +1,8 @@
 streamlit
+pillow
+PyPDF2
+python-docx
+opencv-python-headless
+anthropic
+vertexai
+requests
